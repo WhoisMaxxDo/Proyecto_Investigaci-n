@@ -5,48 +5,56 @@ Proyecto de ISW-612, Unidad III. Autores: Derri Umaña y Donald Miranda.
 ## Qué contiene
 
 - `web/index.html`: app HTML/CSS/JS sin servidor. Genera `Autounattend.xml` y un plan JSON, carga dos auditorías, compara conteos, muestra controles y recomendaciones, y exporta JSON o PDF mediante impresión.
-- `scripts/Audit.ps1`: mide cada VM y exporta el contrato JSON documentado en `schema/audit.schema.json`.
+- `scripts/Audit.ps1`: mide la misma VM antes y después y exporta el contrato JSON documentado en `schema/audit.schema.json`.
 - `scripts/Hardening.ps1` y `Restore.ps1`: aplicación y reversión de controles con respaldo, simulación y confirmación.
 - `examples/before.json` y `after.json`: datos **simulados**, solo para probar la app.
 
 El repositorio excluye mediante `.gitignore` el XML generado, planes locales, respaldos y archivos de evidencia de la VM. Revise siempre el contenido antes de publicarlo.
 
-## Dos VM en Parallels
+## Una VM en Parallels: antes y después
 
-Cree dos VM propias y aisladas con **la misma ISO, edición, hardware virtual y configuración de red**. Etiquete una `por_defecto` y otra `endurecida`. Use instantáneas y no ejecute el archivo de instalación en un equipo con datos. El generador borra por completo el **disco 0** de la VM endurecida si se usa el XML generado.
+Use la única VM Windows 11 disponible. Copie esta carpeta a `C:\Lab\Windows-Image-Hardening-Lab` dentro de Windows y abra Windows PowerShell 5.1 **como administrador** desde la consola de Parallels. La etiqueta `por_defecto` significa **estado inicial observado**; no demuestra que Windows se instaló con todos los valores predeterminados.
 
-1. Instale la primera VM manualmente con valores predeterminados. Abra Windows PowerShell 5.1 **como administrador**, desde la consola de Parallels, y ejecute:
+1. Mida el estado inicial antes de cambiar opciones:
 
    ```powershell
+   Set-Location C:\Lab\Windows-Image-Hardening-Lab
    .\scripts\Audit.ps1 -Profile por_defecto -OutputPath .\evidence\before.json
+   Get-FileHash .\evidence\before.json -Algorithm SHA256
    ```
 
-2. Abra `web/index.html` directamente en el navegador. Indique nombre, usuario estándar, idioma, zona e índice correcto de la imagen de la ISO (`DISM /Get-WimInfo`). Revise la opción de borrado del disco 0 y los términos de licencia antes de marcarlos. Genere y descargue `Autounattend.xml` y `hardening-plan.json`.
-3. El XML contiene **dos contraseñas temporales aleatorias**, visibles al generar: una para el usuario estándar y otra para `LabAdmin`. No se pide ninguna contraseña real. Anótelas fuera de la VM, no publique el XML, elimínelo del medio de instalación y del equipo tras usarlo, y cambie ambas contraseñas. La codificación que ofrece Windows SIM **no cifra** las contraseñas. Verifique con Windows System Image Manager el XML contra la imagen exacta. La automatización puede variar según edición y medio; compruebe su funcionamiento en Parallels.
-4. Instale la segunda VM UEFI/GPT con `Autounattend.xml` en el medio de instalación. El XML prepara EFI, MSR y Windows en el disco 0 e instala la imagen por índice. Si Setup muestra un error, deténgase y registre el mensaje. No se incluyen claves de producto ni bypass de Windows 11; use un medio legal de evaluación compatible. Este ejemplo no crea una partición WinRE separada: registre esa limitación.
-5. Inicie sesión como `LabAdmin` en la consola de la segunda VM. Antes de que inicie sesión el usuario estándar, revise el plan. Ejecute primero el modo de simulación:
+2. Cree una **instantánea de Parallels** y conserve acceso a la consola. Abra `web/index.html` en el navegador. Genere `Autounattend.xml` y `hardening-plan.json`. Copie el plan a la raíz de este proyecto en Windows y revíselo. El XML sirve para mostrar el diseño de la instalación desatendida; si dispone de Windows SIM, valídelo contra la ISO exacta. **No ejecute el XML en esta VM**: el archivo generado borra el disco 0. Con una sola VM, la comparación no prueba la instalación desatendida. El XML contiene contraseñas temporales de laboratorio; no lo publique.
+
+3. Simule el plan, sin aplicar cambios:
 
    ```powershell
    .\scripts\Hardening.ps1 -PlanPath .\hardening-plan.json
    ```
 
-6. Si el plan corresponde a la VM, aplíquelo con acceso a consola e instantánea disponibles. El script solicita confirmación y guarda respaldo:
+4. Si el plan corresponde a la VM, aplíquelo con instantánea y acceso a consola disponibles. El script solicita confirmación y guarda respaldo:
 
    ```powershell
-   .\scripts\Hardening.ps1 -PlanPath .\hardening-plan.json -Apply -LocalConsoleAcknowledged -BackupPath .\evidence\backup.json
+   $opciones = @{
+     PlanPath = '.\hardening-plan.json'
+     Apply = $true
+     LocalConsoleAcknowledged = $true
+     BackupPath = '.\evidence\backup.json'
+   }
+   .\scripts\Hardening.ps1 @opciones
    ```
 
-   Si seleccionó BitLocker, agregue `-RecoveryDirectory E:\Respaldo` usando **otra unidad** ya montada, idealmente externa y protegida. El script verifica TPM y guarda allí la clave de recuperación. No la suba al repositorio. BitLocker no se descifra automáticamente al restaurar.
+   Si seleccionó BitLocker, agregue `RecoveryDirectory = 'E:\Respaldo'` al bloque `$opciones` usando **otra unidad** ya montada. El script verifica TPM y guarda allí la clave de recuperación. No la suba al repositorio. BitLocker no se descifra automáticamente al restaurar.
 
-7. Reinicie si deshabilitó SMBv1. En la VM endurecida ejecute:
+5. Reinicie si deshabilitó SMBv1. En la **misma VM** repita la auditoría:
 
    ```powershell
    .\scripts\Audit.ps1 -Profile endurecida -OutputPath .\evidence\after.json
+   Get-FileHash .\evidence\after.json -Algorithm SHA256
    ```
 
-8. En la web cargue `before.json` en **VM por defecto** y `after.json` en **VM endurecida**. Exporte el informe JSON o use **Guardar PDF / imprimir**. Registre por separado los tiempos de instalación, capturas y observaciones reales. Si no se ejecutaron las VM, use únicamente el botón **Cargar ejemplo simulado** y dígalo expresamente en la defensa.
+6. En la web cargue `before.json` en **Antes** y `after.json` en **Después**. Exporte el informe JSON o use **Guardar PDF / imprimir**. Registre capturas y observaciones reales por separado. Si aún no ejecutó las auditorías, use solo el botón **Cargar ejemplo simulado** y dígalo expresamente en la defensa.
 
-Para restaurar estados respaldados de cuentas, servicios, RDP, SMBv1 y firewall en la VM endurecida:
+Para restaurar estados respaldados de cuentas, servicios, RDP, SMBv1 y firewall en la misma VM:
 
 ```powershell
 .\scripts\Restore.ps1 -BackupPath .\evidence\backup.json
@@ -61,7 +69,7 @@ La app muestra conteos antes/después de servicios activos, puertos TCP en escuc
 
 La página no usa servidor, telemetría ni bibliotecas remotas. Procesa JSON en memoria; limita archivos a 1 MB e inserta datos con `textContent`. El XML temporal sí contiene credenciales de laboratorio y debe tratarse como secreto.
 
-La validación del XML con Windows SIM y la ejecución de los scripts en ambas VM son necesarias para demostrar el experimento.
+**Valide** `Autounattend.xml` con Windows SIM antes de usarlo y ejecute los scripts en la VM para obtener resultados reales. El antes/después mide cambios por endurecimiento y puede incluir variación por reinicio; no mide el efecto independiente de la instalación desatendida.
 
 ## Fuentes principales
 

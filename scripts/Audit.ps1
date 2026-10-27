@@ -4,18 +4,18 @@
 Mide la superficie y los controles de una VM Windows 11 del Tema 1.
 .DESCRIPTION
 Solo lee configuracion local y guarda un JSON. No cambia cuentas, servicios,
-firewall ni opciones del sistema. Ejecute el mismo script en ambas VM desde
-Windows PowerShell 5.1 de 64 bits, preferiblemente como administrador, para
-que las consultas tengan el mismo alcance.
+firewall ni opciones del sistema. Ejecute el mismo script antes y despues
+en la misma VM, desde Windows PowerShell 5.1 de 64 bits y preferiblemente
+como administrador, para que las consultas tengan el mismo alcance.
 
 Profile es una etiqueta proporcionada por quien ejecuta el script; el script
-no puede deducir si una VM fue endurecida. El JSON incluye los ocho campos
+no puede deducir si la VM fue endurecida. El JSON incluye los ocho campos
 minimos de la guia: equipo, fecha, perfil, servicios, puertos, usuarios,
 firewall y caracteristicas opcionales. Una consulta fallida se registra como
 null o unknown; nunca se interpreta como cero ni como cumplimiento.
 .PARAMETER OutputPath
 Ruta del JSON. Se crea el directorio padre si no existe. Un archivo con el
-mismo nombre se reemplaza; use rutas distintas para cada VM.
+mismo nombre se reemplaza; use rutas distintas para antes y despues.
 .PARAMETER Profile
 Etiqueta por_defecto o endurecida. Se copia a perfil y al alias profile
 usado por la aplicacion web. Ambas propiedades deben coincidir.
@@ -26,8 +26,8 @@ usado por la aplicacion web. Ambas propiedades deben coincidir.
 .NOTES
 Contrato: datos/esquema.md y schema/audit.schema.json. Los conteos de
 puertos y reglas son observaciones locales: no prueban accesibilidad desde
-otra maquina ni reduccion de riesgo. Compruebe los resultados en las VM
-del laboratorio antes de usarlos como evidencia.
+otra maquina ni reduccion de riesgo. Ejecute el script en Windows antes
+de presentar resultados como evidencia.
 #>
 [CmdletBinding()]
 param(

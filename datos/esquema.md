@@ -19,4 +19,4 @@
 
 Un fallo de consulta se representa con `null` o `unknown`, nunca con cero. El puntaje excluye `na` y `unknown`. La comparación de dos perfiles debe interpretarse por elemento: la cantidad de servicios o puertos no es por sí sola una medida de riesgo.
 
-El script usa `-Profile` solo para **etiquetar** la captura; no determina por sí mismo qué imagen se instaló. Se recomienda ejecutar el mismo script en Windows PowerShell 5.1 de 64 bits con permisos de administrador en ambas VM, guardar archivos distintos y registrar la evidencia de instalación. Consulte `Get-Help .\scripts\Audit.ps1 -Full` para parámetros, ejemplos y alcance.
+El script usa `-Profile` solo para **etiquetar** la captura; no determina por sí mismo qué imagen se instaló. Se recomienda ejecutar el mismo script en Windows PowerShell 5.1 de 64 bits con permisos de administrador antes y después en la misma VM, guardar archivos distintos y registrar los cambios de configuración. Consulte `Get-Help .\scripts\Audit.ps1 -Full` para parámetros, ejemplos y alcance.
