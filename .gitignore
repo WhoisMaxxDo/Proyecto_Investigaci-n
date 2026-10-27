@@ -1,0 +1,13 @@
+.DS_Store
+**/.DS_Store
+
+# Generados durante la instalacion o la auditoria; pueden contener credenciales,
+# cuentas locales, claves de recuperacion o datos de la VM.
+Autounattend.xml
+hardening-plan.json
+hardening-backup.json
+backup.json
+comparison-report.json
+evidence/*
+*.bek
+*RecoveryKey*.txt

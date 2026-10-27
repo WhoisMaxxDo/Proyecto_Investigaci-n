@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/windows-image-hardening/audit.schema.json",
+  "title": "Windows Image Hardening Lab audit",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "capturedAt", "source", "perfil", "profile", "equipo", "fecha", "machine", "controls", "servicios_en_ejecucion", "puertos_escuchando", "usuarios_locales", "firewall", "caracteristicas_opcionales"],
+  "properties": {
+    "schemaVersion": {"const": "1.0"},
+    "kind": {"const": "windows-image-audit"},
+    "capturedAt": {"type": "string", "format": "date-time"},
+    "source": {"enum": ["measured", "simulated"]},
+    "profile": {"enum": ["por_defecto", "endurecida"]},
+    "perfil": {"enum": ["por_defecto", "endurecida"]},
+    "equipo": {"type": "string"},
+    "fecha": {"type": "string", "format": "date-time"},
+    "servicios_en_ejecucion": {"type": ["array", "null"], "items": {"type": "string"}},
+    "puertos_escuchando": {"type": ["array", "null"], "items": {"type": "integer"}},
+    "usuarios_locales": {"type": ["array", "null"], "items": {"type": "object", "required": ["nombre", "habilitado"], "properties": {"nombre": {"type": "string"}, "habilitado": {"type": "boolean"}, "sid": {"type": "string"}}}},
+    "firewall": {"type": ["array", "null"], "items": {"type": "object", "required": ["perfil", "activo", "entrada"], "properties": {"perfil": {"type": "string"}, "activo": {"type": "boolean"}, "entrada": {"type": "string"}}}},
+    "caracteristicas_opcionales": {"type": ["array", "null"], "items": {"type": "string"}},
+    "machine": {"type": "object", "required": ["name", "os"], "properties": {"name": {"type": "string"}, "os": {"type": "string"}, "version": {"type": "string"}}},
+    "controls": {"type": "array", "minItems": 9, "maxItems": 9, "items": {"type": "object", "additionalProperties": false, "required": ["id", "status", "observed"], "properties": {"id": {"enum": ["firewall", "inbound", "guest", "admin", "rdp", "winrm", "sshd", "bitlocker", "updates"]}, "status": {"enum": ["pass", "fail", "na", "unknown"]}, "observed": {"type": "string"}, "reason": {"type": "string"}}}},
+    "exposure": {"type": "object", "required": ["tcpListeningPorts", "inboundAllowRules", "note"], "properties": {"tcpListeningPorts": {"type": ["array", "null"], "items": {"type": "integer", "minimum": 0, "maximum": 65535}}, "inboundAllowRules": {"type": ["integer", "null"], "minimum": 0}, "note": {"type": "string"}}}
+  }
+}

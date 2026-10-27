@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "windows-image-audit",
+  "capturedAt": "2026-01-01T00:00:00Z",
+  "source": "simulated",
+  "machine": {
+    "os": "Windows 11 Pro · EJEMPLO",
+    "name": "VM-DEMO"
+  },
+  "controls": [
+    {
+      "id": "firewall",
+      "status": "pass",
+      "observed": "Perfiles activos · ejemplo"
+    },
+    {
+      "id": "inbound",
+      "status": "fail",
+      "observed": "Una entrada permitida · ejemplo"
+    },
+    {
+      "id": "guest",
+      "status": "pass",
+      "observed": "Invitado deshabilitado · ejemplo"
+    },
+    {
+      "id": "admin",
+      "status": "fail",
+      "observed": "Administrador integrado activo · ejemplo"
+    },
+    {
+      "id": "rdp",
+      "status": "fail",
+      "observed": "RDP habilitado sin necesidad · ejemplo"
+    },
+    {
+      "id": "winrm",
+      "status": "pass",
+      "observed": "WinRM deshabilitado · ejemplo"
+    },
+    {
+      "id": "sshd",
+      "status": "pass",
+      "observed": "sshd ausente · ejemplo"
+    },
+    {
+      "id": "bitlocker",
+      "status": "fail",
+      "observed": "Volumen sin protección · ejemplo"
+    },
+    {
+      "id": "updates",
+      "status": "unknown",
+      "observed": "Consulta no disponible · ejemplo"
+    }
+  ],
+  "perfil": "por_defecto",
+  "profile": "por_defecto",
+  "equipo": "VM-DEMO",
+  "fecha": "2026-01-01T00:00:00Z",
+  "servicios_en_ejecucion": [
+    "EventLog",
+    "WinRM",
+    "Spooler",
+    "wuauserv"
+  ],
+  "puertos_escuchando": [
+    135,
+    139,
+    445
+  ],
+  "usuarios_locales": [
+    {
+      "nombre": "LabAdmin",
+      "habilitado": true
+    },
+    {
+      "nombre": "Estudiante",
+      "habilitado": true
+    },
+    {
+      "nombre": "Invitado",
+      "habilitado": true
+    }
+  ],
+  "firewall": [
+    {
+      "perfil": "Private",
+      "activo": true,
+      "entrada": "Block"
+    }
+  ],
+  "caracteristicas_opcionales": [
+    "SMB1Protocol",
+    "NetFx3",
+    "MediaPlayback"
+  ],
+  "exposure": {
+    "tcpListeningPorts": [
+      135,
+      139,
+      445
+    ],
+    "inboundAllowRules": 12,
+    "note": "Ejemplo simulado; no representa una VM."
+  }
+}
